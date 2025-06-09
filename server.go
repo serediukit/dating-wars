@@ -6,20 +6,19 @@ import (
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
+
+	"github.com/serediukit/dating-wars/model"
 )
 
-type User struct {
-	ID    string `json:"id"`
-	Name  string `json:"username"`
-	Email string `json:"email"`
-}
-
-var users []User
+var users []model.User
+var searchableUsers []model.SearchableUser
 
 func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/users", getUsers).Methods("GET")
 	router.HandleFunc("/users", createUser).Methods("POST")
+
+	router.HandleFunc("/pickup", getSearchableUsers).Methods("GET")
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
@@ -32,14 +31,23 @@ func getUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 func createUser(w http.ResponseWriter, r *http.Request) {
-	newUser := User{}
-	err := json.NewDecoder(r.Body).Decode(&newUser)
+	newUserData := model.UserData{}
+	err := json.NewDecoder(r.Body).Decode(&newUserData)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	users = append(users, newUser)
-	err = json.NewEncoder(w).Encode(newUser)
+	users = append(users, newUserData.User)
+	searchableUsers = append(searchableUsers, newUserData.SearchableUser)
+
+	err = json.NewEncoder(w).Encode(newUserData)
+	if err != nil {
+		fmt.Println(err)
+	}
+}
+
+func getSearchableUsers(w http.ResponseWriter, r *http.Request) {
+	err := json.NewEncoder(w).Encode(searchableUsers)
 	if err != nil {
 		fmt.Println(err)
 	}
