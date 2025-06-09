@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	"github.com/serediukit/dating-wars/model"
+	"github.com/serediukit/dating-wars/util"
 )
 
 var users []model.User
@@ -41,6 +42,20 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 	searchableUsers = append(searchableUsers, newUserData.SearchableUser)
 
 	err = json.NewEncoder(w).Encode(newUserData)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	_, err = w.Write(
+		[]byte(
+			fmt.Sprintf(
+				"Country: %s\nGender: %s\nSearch Gender: %s\n",
+				util.CountryNames[newUserData.SearchableUser.CountryID],
+				util.Genders[newUserData.SearchableUser.GenderID],
+				util.Genders[newUserData.SearchableUser.SearchGenderID],
+			),
+		),
+	)
 	if err != nil {
 		fmt.Println(err)
 	}
