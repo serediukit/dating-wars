@@ -46,6 +46,7 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 	}
 
+	w.WriteHeader(http.StatusOK)
 	_, err = w.Write(
 		[]byte(
 			fmt.Sprintf(
